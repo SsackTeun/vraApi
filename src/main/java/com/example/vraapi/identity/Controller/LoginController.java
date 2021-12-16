@@ -1,20 +1,20 @@
 package com.example.vraapi.identity.Controller;
 
 import ch.qos.logback.classic.pattern.MessageConverter;
+import com.example.vraapi.identity.Schemas.AccessToken;
 import com.example.vraapi.identity.Schemas.LoginRequest;
 import com.example.vraapi.identity.Schemas.Token;
+import com.example.vraapi.identity.Service.LoginService;
 import com.example.vraapi.util.MapToMultiValueMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -35,40 +35,50 @@ public class LoginController {
     //schema Object 를 Map으로 변환
     private ObjectMapper objectMapper;
     private Map<String, String> parameters;
+    private LoginService loginService;
 
-    public LoginController(WebClient webClient) {
+    @Autowired
+    public LoginController(WebClient webClient, LoginService loginService) {
         this.webClient = webClient;
     }
 
     @GetMapping("/login")
-    public ModelAndView login(ModelAndView mav){
+    public ModelAndView loginPage(ModelAndView mav){
         mav.setViewName("login");
         return mav;
     }
 
     @PostMapping(value = "/login")
-    public ModelAndView loginAttempt(ModelAndView mav, @RequestBody LoginRequest loginRequest){
-        // LoginRequest Schema (Object to Map)
+    public ModelAndView login(ModelAndView mav, @RequestBody LoginRequest loginRequest){
+        Mono<Token> token = null;
+        loginService.basicLogin(loginRequest);
+        token.subscribe(response -> {
+            System.out.println("response : " + response);
+        }, e-> {
+            System.out.println("error : " + e.getMessage());
+        });
+        return mav;
+    }
+
+    @PostMapping(value = "/enhancedlogin")
+    public ModelAndView enhanced_login(ModelAndView mav, @RequestBody LoginRequest loginRequest){
         objectMapper = new ObjectMapper();
         parameters = new HashMap<String, String>();
         parameters = objectMapper.convertValue(loginRequest, Map.class);
 
-        Mono<Token> token = webClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/csp/gateway/am/api/login")
-                                .build())
+        Mono<AccessToken> accessToken = webClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/csp/gateway/am/idp/auth/login").build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(parameters) //body (MultiValueMap 사용시 500 Error)
+                .bodyValue(parameters)
                 .retrieve()
-                .bodyToMono(Token.class);
+                .bodyToMono(AccessToken.class);
 
-        token.subscribe(response ->{
+        accessToken.subscribe(response -> {
             System.out.println("response : " + response);
-        }, e->{
-            System.out.println("error " + e.getMessage());
+        }, e-> {
+            System.out.println("error : " + e.getMessage());
         });
-
         return mav;
     }
-
 }

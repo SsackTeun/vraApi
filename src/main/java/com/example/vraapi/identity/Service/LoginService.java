@@ -16,16 +16,16 @@ import java.util.Map;
 @Service
 public class LoginService {
 
-    private WebClient webClient;
     private Map<String, String> parameters;
     private ObjectMapper objectMapper;
+    private WebClient webClient;
 
     @Autowired
-    LoginService(WebClient webClient) {
+    public LoginService(WebClient webClient){
         this.webClient = webClient;
     }
 
-    public Mono<Token> basicLogin(LoginRequest loginRequest){
+    public Mono<Token> basicLogin(LoginRequest loginRequest, ){
         objectMapper = new ObjectMapper();
         parameters = new HashMap<>();
         parameters = objectMapper.convertValue(loginRequest, Map.class);

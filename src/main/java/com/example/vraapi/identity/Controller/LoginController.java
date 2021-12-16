@@ -38,8 +38,9 @@ public class LoginController {
     private LoginService loginService;
 
     @Autowired
-    public LoginController(WebClient webClient, LoginService loginService) {
+    public LoginController(WebClient webClient) {
         this.webClient = webClient;
+        this.loginService = new LoginService(this.webClient);
     }
 
     @GetMapping("/login")
@@ -50,8 +51,8 @@ public class LoginController {
 
     @PostMapping(value = "/login")
     public ModelAndView login(ModelAndView mav, @RequestBody LoginRequest loginRequest){
-        Mono<Token> token = null;
-        loginService.basicLogin(loginRequest);
+        loginService =
+        Mono<Token> token = loginService.basicLogin(loginRequest);
         token.subscribe(response -> {
             System.out.println("response : " + response);
         }, e-> {

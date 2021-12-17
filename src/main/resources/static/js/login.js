@@ -10,7 +10,7 @@ function login(){
     let scope = 'string';
         //document.getElementById().value;
 
-    fetch('/login', {
+    fetch('/enhancedLogin', {
         method : "POST",
         headers : {
             "Content-Type" : "application/json",

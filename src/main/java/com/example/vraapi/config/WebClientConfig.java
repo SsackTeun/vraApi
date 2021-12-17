@@ -27,7 +27,7 @@ import javax.net.ssl.SSLException;
 public class WebClientConfig {
 
     @Bean
-    public WebClient createWebClient() throws SSLException {
+    public WebClient webClient() throws SSLException {
         SslContext ssl = SslContextBuilder
                 .forClient()
                 .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
@@ -35,3 +35,5 @@ public class WebClientConfig {
         return WebClient.builder().baseUrl("https://vra.sddc.local/").clientConnector(new ReactorClientHttpConnector(httpClient)).build();
     }
 }
+
+

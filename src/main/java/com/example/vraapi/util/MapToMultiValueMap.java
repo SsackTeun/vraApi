@@ -1,4 +1,4 @@
-package com.example.vraapi.identity.Controller.util;
+package com.example.vraapi.util;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

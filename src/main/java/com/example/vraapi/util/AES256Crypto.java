@@ -1,4 +1,4 @@
-package com.example.vraapi.identity.Controller.util;
+package com.example.vraapi.util;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;

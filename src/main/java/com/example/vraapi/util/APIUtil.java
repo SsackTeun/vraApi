@@ -21,13 +21,13 @@ public class APIUtil<T> {
     private ObjectMapper objectMapper;
     private Map parameters;
     private final WebClient webClient;
-    private AccessToken token;
+    private String token;
 
     public APIUtil(WebClient webClient) {
         this.webClient = webClient;
     }
 
-    public APIUtil(WebClient webClient, AccessToken token){
+    public APIUtil(WebClient webClient, String token){
         this.webClient = webClient;
         this.token = token;
     }
@@ -68,7 +68,29 @@ public class APIUtil<T> {
         return result;
     }
 
-    public Mono post(Object obj, String URL, Class<com.example.vraapi.identity.Schemas.Token> toValueType, HashMap<String, String> additionalParameters){
+    public ResponseEntity<T> get(Object obj, URI uri, Class<T> type){
+        objectMapper = new ObjectMapper();
+        parameters = new HashMap<String, String>();
+        parameters = objectMapper.convertValue(obj, Map.class);
+
+        ResponseEntity<T> result;
+
+        result = (ResponseEntity<T>) webClient.get()
+                .uri(uriBuilder -> uriBuilder.
+                        path(uri.getPath()).
+                        query(uri.getQuery()).
+                        build())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError(),
+                    response -> Mono.error(new Exception("error : " + response.statusCode())))
+                .toEntity(type)
+                .block();
+
+        return result;
+    }
+
+    /*public Mono post(Object obj, String URL, Class<com.example.vraapi.identity.Schemas.Token> toValueType, HashMap<String, String> additionalParameters){
         objectMapper = new ObjectMapper();
         parameters = new HashMap<String, String>();
 
@@ -88,5 +110,5 @@ public class APIUtil<T> {
                 .retrieve()
                 .bodyToMono(toValueType);
         return t;
-    }
+    }*/
 }

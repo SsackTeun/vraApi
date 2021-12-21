@@ -19,6 +19,7 @@ public class LoginService {
     //new 로 생성하는 객체 인스턴스는
     private final WebClient webClient;
 
+    //LoginController
     public ResponseEntity<AccessToken> basicLogin(LoginRequest loginRequest){
         APIUtil<AccessToken> api = new APIUtil<>(webClient);
         return api.post(loginRequest, URI.create("/csp/gateway/am/api/login?access_token"), AccessToken.class);

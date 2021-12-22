@@ -32,9 +32,9 @@ public class PrincipalUserController {
        */
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> profile(@CookieValue("token") String accessToken){
-        ResponseEntity<UserProfileResponse> organizations = principalUserService.userProfile(accessToken);
-        log.info(organizations.getBody().toString());
-        return organizations;
+        ResponseEntity<UserProfileResponse> profile = principalUserService.userProfile(accessToken);
+        log.info(profile.getBody().toString());
+        return profile;
     }
 
 
@@ -44,9 +44,9 @@ public class PrincipalUserController {
     */
     @GetMapping("/orgs")
     public ResponseEntity<Organizations> organizationRefLink(@CookieValue("token") String accessToken){
-        ResponseEntity<Organizations> organizations = principalUserService.organizationsRefLink(accessToken);
-        log.info(organizations.getBody().toString());
-        return organizations;
+        ResponseEntity<Organizations> organizationRefLink = principalUserService.organizationsRefLink(accessToken);
+        log.info(organizationRefLink.getBody().toString());
+        return organizationRefLink;
     }
 
     /*
@@ -54,10 +54,10 @@ public class PrincipalUserController {
     required : header -> HttpHeader.Authorization , AccessToken
     */
     @GetMapping("/orgs/orgId")
-    public ResponseEntity<OrganizationResponse> organizationInfoDetail(@CookieValue("token") String accessToken){
-        ResponseEntity<OrganizationResponse> organizationsDetail = principalUserService.organizationsDetail(accessToken);
-        log.info(organizationsDetail.getBody().toString());
-        return organizationsDetail;
+    public ResponseEntity<OrganizationResponse> organizationOrgId(@CookieValue("token") String accessToken){
+        ResponseEntity<OrganizationResponse> organizationsOrgId = principalUserService.organizationsDetail(accessToken);
+        log.info(organizationsOrgId.getBody().toString());
+        return organizationsOrgId;
     }
 
     /*
@@ -89,10 +89,36 @@ public class PrincipalUserController {
         return organizationServiceRole;
     }
 
+    /*
+    URI : /csp/gateway/am/api/loggedin/user/default-org
+    required : header -> HttpHeader.Authorization , AccessToken
+    */
     @GetMapping("/default-org")
     public ResponseEntity<RefLink> organizationDefault(@CookieValue("token") String accessToken){
-        ResponseEntity<RefLink> organizationServiceRole = principalUserService.default_org(accessToken);
-        log.info(organizationServiceRole.getBody().toString());
-        return organizationServiceRole;
+        ResponseEntity<RefLink> organizationDefault = principalUserService.default_org(accessToken);
+        log.info(organizationDefault.getBody().toString());
+        return organizationDefault;
+    }
+
+    /*
+    URI : /csp/gateway/am/api/loggedin/user/details
+    required : header -> HttpHeader.Authorization , AccessToken
+    */
+    @GetMapping("/details")
+    public ResponseEntity<UserDetailsResponse> userDetails(@CookieValue("token") String accessToken){
+        ResponseEntity<UserDetailsResponse> userDetails = principalUserService.userDetails(accessToken);
+        log.info(userDetails.getBody().toString());
+        return userDetails;
+    }
+
+    /*
+    URI : /csp/gateway/am/api/loggedin/user/orgs/{orgId}/info
+    required : header -> HttpHeader.Authorization , AccessToken
+    */
+    @GetMapping("/orgs/orgId/info")
+    public ResponseEntity<UserInfo> orgInfo(@CookieValue("token") String accessToken){
+        ResponseEntity<UserInfo> orgInfo = principalUserService.orgInfo(accessToken);
+        log.info(orgInfo.getBody().toString());
+        return orgInfo;
     }
 }

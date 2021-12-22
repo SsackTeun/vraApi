@@ -13,6 +13,6 @@ public class User {
     private String email;
     private String refLink;
     private String[] groups;
-    private LeanUserProfile[] userProfile;
+    private LeanUserProfile userProfile;
     private String managerId;
 }

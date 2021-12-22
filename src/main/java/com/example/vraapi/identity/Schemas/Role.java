@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class Role {
     private String id;
-    private int createdMillis;
-    private int updatedMillis;
+    private long createdMillis;
+    private long updatedMillis;
     private String name;
     private String displayName;
     private String orgId;

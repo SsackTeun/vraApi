@@ -46,8 +46,8 @@ public class PrincipalUserService {
        }
     * */
     public ResponseEntity<Organizations> organizationsRefLink(String accessToken){
-        APIUtil<Organizations> api = new APIUtil<>(webClient, accessToken);
-        return api.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs"), Organizations.class);
+        APIUtil<Organizations> organizationsRefLink = new APIUtil<>(webClient, accessToken);
+        return organizationsRefLink.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs"), Organizations.class);
     }
 
     /*
@@ -70,8 +70,8 @@ public class PrincipalUserService {
         String orgRefLink = organizationsRefLink(accessToken).getBody().getRefLinks()[0];
 
         ///csp/gateway/am/api/loggedin/user/orgs/{orgId} <- orgId 파라미터로 주입
-        APIUtil<OrganizationResponse> OrganizationResponse = new APIUtil<>(webClient, accessToken);
-        return OrganizationResponse.get(null, URI.create(orgRefLink), OrganizationResponse.class);
+        APIUtil<OrganizationResponse> organizationsDetail = new APIUtil<>(webClient, accessToken);
+        return organizationsDetail.get(null, URI.create(orgRefLink), OrganizationResponse.class);
     }
 
     /*
@@ -87,8 +87,8 @@ public class PrincipalUserService {
      * */
     public ResponseEntity<RoleResponse[]> userRole(String accessToken){
         String orgId = organizationsDetail(accessToken).getBody().getId();
-        APIUtil<RoleResponse[]> userProfile = new APIUtil<>(webClient, accessToken);
-        return userProfile.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/" + orgId + "/roles"), RoleResponse[].class);
+        APIUtil<RoleResponse[]> userRole = new APIUtil<>(webClient, accessToken);
+        return userRole.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/" + orgId + "/roles"), RoleResponse[].class);
     }
 
      /*
@@ -110,8 +110,8 @@ public class PrincipalUserService {
      */
     public ResponseEntity<UserServiceRoles> serviceRoles(String accessToken){
         String orgId = organizationsDetail(accessToken).getBody().getId();
-        APIUtil<UserServiceRoles> userProfile = new APIUtil<>(webClient, accessToken);
-        return userProfile.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/" + orgId + "/service-roles"), UserServiceRoles.class);
+        APIUtil<UserServiceRoles> serviceRoles = new APIUtil<>(webClient, accessToken);
+        return serviceRoles.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/" + orgId + "/service-roles"), UserServiceRoles.class);
     }
 
     /*
@@ -122,8 +122,78 @@ public class PrincipalUserService {
      * )
      */
     public ResponseEntity<RefLink> default_org(String accessToken){
+        APIUtil<RefLink> default_org = new APIUtil<>(webClient, accessToken);
+        return default_org.get(null, URI.create("/csp/gateway/am/api/loggedin/user/default-org"), RefLink.class);
+    }
+
+    /*
+     * URI : /csp/gateway/am/api/loggedin/user/details
+     * DO : RefLink 리턴
+     * RefLink(
+     *  {"refLink":"/csp/gateway/am/api/orgs/294b6b99-140c-405b-ba23-570936ba8a2d"}
+     * )
+     */
+    public ResponseEntity<UserDetailsResponse> userDetails(String accessToken){
+        APIUtil<UserDetailsResponse> userProfile = new APIUtil<>(webClient, accessToken);
+        return userProfile.get(null, URI.create("/csp/gateway/am/api/loggedin/user/details"), UserDetailsResponse.class);
+    }
+
+    /*
+     * URI : /csp/gateway/am/api/loggedin/user/orgs/{orgId}/info
+     * DO :  UserInfo 리턴
+     * UserInfo(
+     *  {
+          "user": {
+            "id": "5e7d8164-389a-47b4-b626-abe6d1f1b440",
+            "firstName": "jaeyoung",
+            "lastName": "bae",
+            "username": "jy",
+            "acct": "jy",
+            "password": null,
+            "email": "jy@onware.co.kr",
+            "refLink": "/csp/gateway/am/api/users/jy",
+            "groups": [
+              "4b837d9a-a09a-4589-b8d2-fa500af22e0c",
+              "105f449f-bf6b-466f-9eca-54f053e3eb84"
+            ],
+            "userProfile": null,
+            "managerId": null
+          },
+          "userOrgInfo": [
+            {
+              "displayName": "VIDM",
+              "name": "vidm",
+              "orgRoles": [
+                {
+                  "id": "fbef8b1b-5038-4fbf-bb05-edc8177f7e1a",
+                  "createdMillis": 1614243155490,
+                  "updatedMillis": 0,
+                  "name": "org_owner",
+                  "displayName": "Organization Owner",
+                  "orgId": "294b6b99-140c-405b-ba23-570936ba8a2d",
+                  "visible": true,
+                  "organizationLink": "/csp/gateway/am/api/orgs/294b6b99-140c-405b-ba23-570936ba8a2d",
+                  "refLink": "/csp/gateway/am/api/orgs/294b6b99-140c-405b-ba23-570936ba8a2d/roles/fbef8b1b-5038-4fbf-bb05-edc8177f7e1a",
+                  "userIds": [
+                    "e5731edf-31aa-47ae-bdaa-34b417cb3814",
+                    "78c139d8-c29a-4e9e-85d2-f036c1581844",
+                    "98b4eff1-3962-43d5-a688-396337615254",
+                    "210aed8c-43a5-4532-acff-a01f99d18680",
+                    "5e7d8164-389a-47b4-b626-abe6d1f1b440",
+                    "ba1d551d-0f1c-44b0-b477-31de458fe7e5"
+                  ],
+                  "groupIds": []
+                }
+              ],
+              "serviceDef": null
+            }
+          ]
+        }
+     * )
+     */
+    public ResponseEntity<UserInfo> orgInfo(String accessToken){
         String orgId = organizationsDetail(accessToken).getBody().getId();
-        APIUtil<RefLink> userProfile = new APIUtil<>(webClient, accessToken);
-        return userProfile.get(null, URI.create("/csp/gateway/am/api/loggedin/user/default-org"), RefLink.class);
+        APIUtil<UserInfo> orgInfo = new APIUtil<>(webClient, accessToken);
+        return orgInfo.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/"+ orgId + "/info"), UserInfo.class);
     }
 }

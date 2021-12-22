@@ -41,11 +41,13 @@ public class APIUtil<T> {
 
         if(token != null){
             result = (ResponseEntity<T>) webClient.post()
-                    .uri(uriBuilder -> uriBuilder.path(uri.getPath()).query(uri.getQuery())
+                    .uri(uriBuilder -> uriBuilder
+                            .path(uri.getPath())
+                            .query(uri.getQuery())
                             .build())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .header(HttpHeaders.AUTHORIZATION, token.getAccess_token())
+                    .header(HttpHeaders.AUTHORIZATION, token)
                     .bodyValue(parameters) //body (MultiValueMap 사용시 500 Error)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError(),
@@ -74,18 +76,34 @@ public class APIUtil<T> {
         parameters = objectMapper.convertValue(obj, Map.class);
 
         ResponseEntity<T> result;
+        if(token != null){
+            result = (ResponseEntity<T>) webClient.get()
+                    .uri(uriBuilder -> uriBuilder.
+                            path(uri.getPath()).
+                            query(uri.getQuery()).
+                            build())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, token)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError(),
+                            response -> Mono.error(new Exception("error : " + response.statusCode())))
+                    .toEntity(type)
+                    .block();
+        }else{
+            result = (ResponseEntity<T>) webClient.get()
+                    .uri(uriBuilder -> uriBuilder.
+                            path(uri.getPath()).
+                            query(uri.getQuery()).
+                            build())
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, token)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError(),
+                            response -> Mono.error(new Exception("error : " + response.statusCode())))
+                    .toEntity(type)
+                    .block();
+        }
 
-        result = (ResponseEntity<T>) webClient.get()
-                .uri(uriBuilder -> uriBuilder.
-                        path(uri.getPath()).
-                        query(uri.getQuery()).
-                        build())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError(),
-                    response -> Mono.error(new Exception("error : " + response.statusCode())))
-                .toEntity(type)
-                .block();
 
         return result;
     }

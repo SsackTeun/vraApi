@@ -63,7 +63,6 @@ public class LoginController {
             logger.info("token : " + result.getBody());
             token = result.getBody();
 
-            //Inet4Address.getLocalHost().getHostAddress()
             //data 에 값 담기
             data.put("status", "success");
             data.put("link", "http://localhost" +":8001" + "/consumer");
@@ -79,16 +78,4 @@ public class LoginController {
         logger.info("data : " + data);
         return data;
      }
-
-    @ResponseBody
-    @PostMapping(value = "/loginchk")
-    public ModelAndView enhancedLogin(ModelAndView mav, @RequestBody LoginRequest loginRequest){
-        Mono<Token> accessToken = loginService.enhanceLogin(loginRequest, additionalParameters);
-        accessToken.subscribe(response1 -> {
-            System.out.println("response1 : " + response1);
-        }, e-> {
-            System.out.println("error : " + e.getMessage());
-        });
-        return mav;
-    }
 }

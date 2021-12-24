@@ -48,7 +48,6 @@ public class LoginController {
     @PostMapping(value = "/login")
     public Map<String, String> basicLogin(@RequestBody LoginRequest loginRequest,
                                           HttpServletResponse response) throws UnknownHostException {
-
         //Token variable
         AccessToken token = null;
 

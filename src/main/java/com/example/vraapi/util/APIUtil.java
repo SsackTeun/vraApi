@@ -19,7 +19,7 @@ import java.util.Map;
 public class APIUtil<T> {
 
     private ObjectMapper objectMapper;
-    private Map parameters;
+    private Map requestBody;
     private final WebClient webClient;
     private String token;
 
@@ -32,10 +32,10 @@ public class APIUtil<T> {
         this.token = token;
     }
 
-    public ResponseEntity<T> post(Object obj, URI uri, Class<T> type){
+    public ResponseEntity<T> post(Object body, URI uri, Class<T> type){
         objectMapper = new ObjectMapper();
-        parameters = new HashMap<String, String>();
-        parameters = objectMapper.convertValue(obj, Map.class);
+        requestBody = new HashMap<String, String>();
+        requestBody = objectMapper.convertValue(body, Map.class);
 
         ResponseEntity<T> result;
 
@@ -48,7 +48,7 @@ public class APIUtil<T> {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, token)
-                    .bodyValue(parameters) //body (MultiValueMap 사용시 500 Error)
+                    .bodyValue(requestBody) //body (MultiValueMap 사용시 500 Error)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError(),
                             response -> Mono.error(new Exception("error : " + response.statusCode())))
@@ -60,7 +60,7 @@ public class APIUtil<T> {
                             .build())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .bodyValue(parameters) //body (MultiValueMap 사용시 500 Error)
+                    .bodyValue(requestBody) //body (MultiValueMap 사용시 500 Error)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError(),
                             response -> Mono.error(new Exception("error : " + response.statusCode())))
@@ -70,10 +70,10 @@ public class APIUtil<T> {
         return result;
     }
 
-    public ResponseEntity<T> get(Object obj, URI uri, Class<T> type){
+    public ResponseEntity<T> get(Object body, URI uri, Class<T> type){
         objectMapper = new ObjectMapper();
-        parameters = new HashMap<String, String>();
-        parameters = objectMapper.convertValue(obj, Map.class);
+        requestBody = new HashMap<String, String>();
+        requestBody = objectMapper.convertValue(body, Map.class);
 
         ResponseEntity<T> result;
         if(token != null){
@@ -104,6 +104,31 @@ public class APIUtil<T> {
                     .block();
         }
 
+
+        return result;
+    }
+
+    public ResponseEntity<T> put(Object body, URI uri, Class<T> type){
+        objectMapper = new ObjectMapper();
+        requestBody = new HashMap<String, String>();
+        requestBody = objectMapper.convertValue(body, Map.class);
+
+        ResponseEntity<T> result;
+
+        result = webClient
+                .put()
+                .uri(uriBuilder -> uriBuilder
+                            .path(uri.getPath())
+                            .query(uri.getQuery())
+                            .build()
+                )
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .bodyValue(requestBody)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError(),
+                        response -> Mono.error(new Exception("error : " + response.statusCode())))
+                .toEntity(type)
+                .block();
 
         return result;
     }

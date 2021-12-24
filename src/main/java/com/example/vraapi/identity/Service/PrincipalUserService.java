@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
+import java.util.HashMap;
 
 @Service
 @Slf4j
@@ -134,8 +135,8 @@ public class PrincipalUserService {
      * )
      */
     public ResponseEntity<UserDetailsResponse> userDetails(String accessToken){
-        APIUtil<UserDetailsResponse> userProfile = new APIUtil<>(webClient, accessToken);
-        return userProfile.get(null, URI.create("/csp/gateway/am/api/loggedin/user/details"), UserDetailsResponse.class);
+        APIUtil<UserDetailsResponse> userDetails = new APIUtil<>(webClient, accessToken);
+        return userDetails.get(null, URI.create("/csp/gateway/am/api/loggedin/user/details"), UserDetailsResponse.class);
     }
 
     /*
@@ -195,5 +196,68 @@ public class PrincipalUserService {
         String orgId = organizationsDetail(accessToken).getBody().getId();
         APIUtil<UserInfo> orgInfo = new APIUtil<>(webClient, accessToken);
         return orgInfo.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/"+ orgId + "/info"), UserInfo.class);
+    }
+
+    /*
+    * URI : /csp/gateway/am/api/loggedin/user/orgs/{orgId}/groups
+    * DO : UserGroupsResponse(
+    *   {
+          "groups": [
+            {
+              "id": "4b837d9a-a09a-4589-b8d2-fa500af22e0c",
+              "displayName": "admin@sddc.local",
+              "domain": "sddc.local",
+              "userCount": 0
+            },
+            {
+              "id": "105f449f-bf6b-466f-9eca-54f053e3eb84",
+              "displayName": "ALL USERS",
+              "domain": null,
+              "userCount": 0
+            }
+          ]
+        }
+    * )
+    * */
+    public ResponseEntity<UserGroupsResponse> orgGroups(String accessToken){
+        String orgId = organizationsDetail(accessToken).getBody().getId();
+        APIUtil<UserGroupsResponse> orgGroups = new APIUtil<>(webClient, accessToken);
+        return orgGroups.get(null, URI.create("/csp/gateway/am/api/loggedin/user/orgs/"+ orgId + "/groups"), UserGroupsResponse.class);
+    }
+
+    /*
+    *    URI : /csp/gateway/am/api/loggedin/user
+    *    DO : User(
+    *       {
+              "id": "5e7d8164-389a-47b4-b626-abe6d1f1b440",
+              "firstName": "jaeyoung",
+              "lastName": "bae",
+              "username": "jy",
+              "acct": "jy",
+              "password": null,
+              "email": "jy@onware.co.kr",
+              "refLink": null,
+              "groups": [
+                "4b837d9a-a09a-4589-b8d2-fa500af22e0c",
+                "105f449f-bf6b-466f-9eca-54f053e3eb84"
+              ],
+              "userProfile": null,
+              "managerId": null
+            }
+    *    )
+    * */
+    public ResponseEntity<User> currentlyLoggedUser(String accessToken){
+        APIUtil<User> currentlyLoggedUser = new APIUtil<>(webClient, accessToken);
+        return currentlyLoggedUser.get(null, URI.create("/csp/gateway/am/api/loggedin/user"), User.class);
+    }
+    /*
+    * URI : /csp/gateway/am/api/loggedin/user/profile/locale-preferences
+    * DO : UserLocaleRequest(
+    *
+    * )
+    * */
+    public ResponseEntity<UserLocaleRequest> userLocale(String accessToken, UserLocaleRequest userLocaleRequest){
+        APIUtil<UserLocaleRequest> userLocale = new APIUtil<>(webClient, accessToken);
+        return userLocale.put(userLocaleRequest, URI.create("/csp/gateway/am/api/loggedin/user/profile/locale-preferences"), UserLocaleRequest.class);
     }
 }

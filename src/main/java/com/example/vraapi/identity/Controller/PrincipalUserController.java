@@ -4,11 +4,9 @@ import com.example.vraapi.identity.Schemas.*;
 import com.example.vraapi.identity.Service.PrincipalUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.xml.ws.Response;
 import java.util.Arrays;
@@ -120,5 +118,39 @@ public class PrincipalUserController {
         ResponseEntity<UserInfo> orgInfo = principalUserService.orgInfo(accessToken);
         log.info(orgInfo.getBody().toString());
         return orgInfo;
+    }
+
+    /*
+   URI : /csp/gateway/am/api/loggedin/user/orgs/{orgId}/groups
+   required : header -> HttpHeader.Authorization , AccessToken
+   */
+    @GetMapping("/orgs/orgId/groups")
+    public ResponseEntity<UserGroupsResponse> orgGroups(@CookieValue("token") String accessToken){
+        ResponseEntity<UserGroupsResponse> orgGroups = principalUserService.orgGroups(accessToken);
+        log.info(orgGroups.getBody().toString());
+        return orgGroups;
+    }
+
+    /*
+  URI : /csp/gateway/am/api/loggedin/user
+  required : header -> HttpHeader.Authorization , AccessToken
+  */
+    @GetMapping("")
+    public ResponseEntity<User> currentlyLoggedUser(@CookieValue("token") String accessToken){
+        ResponseEntity<User> currentlyLoggedUser = principalUserService.currentlyLoggedUser(accessToken);
+        log.info(currentlyLoggedUser.getBody().toString());
+        return currentlyLoggedUser;
+    }
+
+    /*
+    URI : /csp/gateway/am/api/loggedin/user/profile/locale-preferences
+    required : header -> HttpHeader.Authorization , AccessToken
+    */
+    @PutMapping("/profile/locale-preferences")
+    public ResponseEntity<UserLocaleRequest> userLocalePreferences(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken, @RequestBody UserLocaleRequest userLocaleRequest){
+        log.info("accessToken : " + accessToken + " UserLocale : " + userLocaleRequest.toString());
+        ResponseEntity<UserLocaleRequest> userLocale = principalUserService.userLocale(accessToken, userLocaleRequest);
+        log.info(userLocale.getBody().toString());
+        return userLocale;
     }
 }

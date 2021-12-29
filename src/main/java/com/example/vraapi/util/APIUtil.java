@@ -1,17 +1,14 @@
 package com.example.vraapi.util;
 
-import com.example.vraapi.identity.Schemas.AccessToken;
-import com.example.vraapi.identity.Schemas.Token;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +17,7 @@ public class APIUtil<T> {
 
     private ObjectMapper objectMapper;
     private Map requestBody;
+    private MultiValueMap requestParam;
     private final WebClient webClient;
     private String token;
 
@@ -70,17 +68,17 @@ public class APIUtil<T> {
         return result;
     }
 
-    public ResponseEntity<T> get(Object body, URI uri, Class<T> type){
+    public ResponseEntity<T> get(Object param, URI uri, Class<T> type){
         objectMapper = new ObjectMapper();
-        requestBody = new HashMap<String, String>();
-        requestBody = objectMapper.convertValue(body, Map.class);
+        requestParam = new LinkedMultiValueMap();
+        requestParam = objectMapper.convertValue(param, MultiValueMap.class);
 
         ResponseEntity<T> result;
         if(token != null){
             result = (ResponseEntity<T>) webClient.get()
                     .uri(uriBuilder -> uriBuilder.
                             path(uri.getPath()).
-                            query(uri.getQuery()).
+                            queryParams(requestParam).
                             build())
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, token)

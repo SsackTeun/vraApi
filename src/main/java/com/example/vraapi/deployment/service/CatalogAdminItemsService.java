@@ -17,8 +17,7 @@ import java.net.URI;
 public class CatalogAdminItemsService {
     private final WebClient webClient;
 
-    public ResponseEntity<PageOfCatalogItem> fetchListOfCatalogItems(CatalogAdminItemsParam catalogAdminItemsParam){
-        new APIUtil<PageOfCatalogItem>(webClient).get(catalogAdminItemsParam, URI.create("/catalog/api/admin/items") , PageOfCatalogItem.class);
-        return null;
+    public ResponseEntity<PageOfCatalogItem> fetchListOfCatalogItems(CatalogAdminItemsParam catalogAdminItemsParam, String token){
+        return new APIUtil<PageOfCatalogItem>(webClient, token).get(catalogAdminItemsParam, URI.create("/catalog/api/admin/items") , PageOfCatalogItem.class);
     }
 }

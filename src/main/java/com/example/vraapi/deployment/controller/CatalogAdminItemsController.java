@@ -6,10 +6,7 @@ import com.example.vraapi.deployment.service.CatalogAdminItemsService;
 import com.example.vraapi.util.APIUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -23,9 +20,10 @@ public class CatalogAdminItemsController {
     }
 
     @RequestMapping("/api/admin/items")
-    public ResponseEntity<PageOfCatalogItem> pageOfCatalogItemResponse(@ModelAttribute CatalogAdminItemsParam catalogAdminItemsParam){
-        log.info("CatalogAdminItemsParam : " + catalogAdminItemsParam.toString());
-        ResponseEntity<PageOfCatalogItem> CatalogAdminItems = catalogAdminItemsService.fetchListOfCatalogItems(catalogAdminItemsParam);
-        return null;
+    public ResponseEntity<PageOfCatalogItem> pageOfCatalogItemResponse(@ModelAttribute CatalogAdminItemsParam catalogAdminItemsParam, @CookieValue("token") String token){
+        log.info("token : " + token);
+        ResponseEntity<PageOfCatalogItem> CatalogAdminItems = catalogAdminItemsService.fetchListOfCatalogItems(catalogAdminItemsParam, token);
+        log.info(CatalogAdminItems.toString());
+        return CatalogAdminItems;
     }
 }

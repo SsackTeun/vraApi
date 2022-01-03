@@ -13,7 +13,7 @@ public class PageOfCatalogItem {
     private int number;
     private int numberOfElements;
     private int size;
-    private Sort sort[];
+    private Sort sort;
     private long totalElements;
     private int totalPages;
 }

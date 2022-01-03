@@ -1,6 +1,8 @@
 package com.example.vraapi.util;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +12,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+@Slf4j
 public class APIUtil<T> {
 
     private ObjectMapper objectMapper;
     private Map requestBody;
-    private MultiValueMap requestParam;
+    private Map requestParam;
     private final WebClient webClient;
     private String token;
 
@@ -70,15 +72,36 @@ public class APIUtil<T> {
 
     public ResponseEntity<T> get(Object param, URI uri, Class<T> type){
         objectMapper = new ObjectMapper();
-        requestParam = new LinkedMultiValueMap();
-        requestParam = objectMapper.convertValue(param, MultiValueMap.class);
+        Map<String, String> map = objectMapper.convertValue(param, new TypeReference<Map<String, String>>(){});
+        MultiValueMap<String, String> onlyNotNullParams = new LinkedMultiValueMap<>();
+        Map<String, String> reset = new LinkedHashMap<>();
+
+        map.forEach((k, v) -> {
+            if(v == null){
+                log.info("null : " + k + ":" + v);
+            }
+            else{
+                log.info("notnull: " + k + ":" + v);
+                reset.put(k, v);
+            }
+            onlyNotNullParams.setAll(reset);
+        });
+
+        onlyNotNullParams.forEach((k, v) ->{
+            log.info("----------");
+            log.info(k + ":" + v);
+        });
+
+      /*  onlyNotNullParams.forEach((k, v) -> {
+            log.info("key : " + k + " value : " + v);
+        });*/
 
         ResponseEntity<T> result;
         if(token != null){
             result = (ResponseEntity<T>) webClient.get()
                     .uri(uriBuilder -> uriBuilder.
                             path(uri.getPath()).
-                            queryParams(requestParam).
+                            queryParams(onlyNotNullParams).
                             build())
                     .accept(MediaType.APPLICATION_JSON)
                     .header(HttpHeaders.AUTHORIZATION, token)
